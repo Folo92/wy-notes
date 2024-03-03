@@ -44,19 +44,23 @@ body {
   pointer-events: none;
 }
 .collapse-block::before {
-  content: "▼";
-  /* content: url(data:image/svg+xml;base64,xevr...); */
-  font-size: 12px;
-  width: 14px;
-  height: 14px;
-  padding: 1px;
-  display: inline;
-  vertical-align: middle;
-  text-align: center;
-  color: lightgray;
+  content: url(assets/collapse.svg);
+  color: grey;
   position: absolute;
-  left: -14px;
-  /* top: 4px; */
+  left: -12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.expand-block {
+  position: relative;
+  pointer-events: none;
+}
+.expand-block::before {
+  content: url(assets/expand.svg);
+  color: grey;
+  position: absolute;
+  left: -12px;
   cursor: pointer;
   pointer-events: auto;
 }

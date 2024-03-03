@@ -116,11 +116,11 @@ class PrintWriter {
     this.buffer.push(`<div class="json-pretty">`);
   }
 
-  printCollapseStart() {
-    this.buffer.push(`<span class="collapse-block">`);
+  printBlockStart() {
+    this.buffer.push(`<span class="expand-block">`);
   }
 
-  printCollapseEnd() {
+  printBlockEnd() {
     this.buffer.push(`</span>`);
   }
 
@@ -157,7 +157,7 @@ const selectPrintFn = (value, out, idt, options, selection) => {
   }
 };
 
-const getCollapseItem = (len) => {
+const getLenText = (len) => {
   if (len === 0) {
     return "";
   }
@@ -168,7 +168,7 @@ const printObject = (object, out, idt, options, selection) => {
   out.checkCircular(object);
   out.print("{");
   out.print(
-    `<span style="display: none; color: grey;">${getCollapseItem(
+    `<span style="display: none; color: grey;">${getLenText(
       Object.keys(object).length
     )}</span>`
   );
@@ -185,7 +185,7 @@ const printObject = (object, out, idt, options, selection) => {
     out.indent(idt + 1);
     const isObject = typeof value === "object" && value !== null;
     if (isObject) {
-      out.printCollapseStart();
+      out.printBlockStart();
     }
     out.printKey(key);
     out.print(":");
@@ -199,7 +199,7 @@ const printObject = (object, out, idt, options, selection) => {
       out.printSelectionEnd();
     }
     if (isObject) {
-      out.printCollapseEnd();
+      out.printBlockEnd();
     }
   }
   out.indent(idt);
@@ -210,7 +210,7 @@ const printObject = (object, out, idt, options, selection) => {
 const printArray = (array, out, idt, options, selection) => {
   out.checkCircular(array);
   out.print("[");
-  out.print(`<span style="display: none; color: grey;">${getCollapseItem(array.length)}</span>`);
+  out.print(`<span style="display: none; color: grey;">${getLenText(array.length)}</span>`);
   out.print(`<span class="wrapper">`);
   out.newLine();
   for (let i = 0; i < array.length; i++) {
@@ -254,27 +254,24 @@ const prettyPrint = (object, options, selection) => {
   return "";
 };
 
-const bindCollapseClick = (parent) => {
-  const collapseBlocks = parent.getElementsByClassName("collapse-block");
-  Array.from(collapseBlocks).forEach((element) => {
-    bindCollapseClick(element); // 递归绑定事件
+const bindBlockClick = (parent) => {
+  const blocks = parent.getElementsByClassName("expand-block");
+  Array.from(blocks).forEach((element) => {
+    bindBlockClick(element); // 递归绑定事件
     element.addEventListener("click", (e) => {
       const childNodes = e.target.childNodes;
+      if (e.target.className === "collapse-block") {
+        e.target.className = "expand-block";
+      } else if (e.target.className === "expand-block") {
+        e.target.className = "collapse-block";
+      }
       Array.from(childNodes).forEach((node, i) => {
         if (i > 1 && i < childNodes.length - 2) {
-          // const eleStyle = getComputedStyle(element, "::before");
-          // console.log(element.classList);
           if (node.style) {
             if (node.style.display === "none") {
               node.style.display = "inline";
-              // element.style.setProperty("--collapse-deg", "rotate(0)");
-              // element.classList.remove("rotate-90");
-              // element.classList.add("rotate-0");
             } else {
               node.style.display = "none";
-              // element.style.setProperty("--collapse-deg", "rotate(-90deg)");
-              // element.classList.remove("rotate-0");
-              // element.classList.add("rotate-90");
             }
           }
         }
@@ -283,11 +280,11 @@ const bindCollapseClick = (parent) => {
   });
 };
 
-const insertJsonHtml = (container, json) => {
-  const jsonHtml = prettyPrint(json, { indent: "&nbsp;&nbsp;" });
-  container.innerHTML = jsonHtml;
-  console.log(container.innerText);
-  bindCollapseClick(container);
+const insertJsonHtml = (element, json, options) => {
+  const jsonHtml = prettyPrint(json, { indent: "&nbsp;&nbsp;", ...options });
+  element.innerHTML = jsonHtml;
+  // console.log(container.innerText);
+  bindBlockClick(element);
 };
 
 // const json = {
