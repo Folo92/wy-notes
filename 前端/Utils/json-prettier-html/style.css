@@ -1,0 +1,92 @@
+body {
+  font-family: Menlo, Monaco, "Courier New", monospace;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 16px;
+  letter-spacing: 0;
+  background-color: #24282a;
+  color: #d4d4d4;
+  text-align: left;
+  border-top: 1px solid #121516;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 0;
+}
+#container {
+  font-family: "Consolas", "宋体";
+  line-height: 1.2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 60px;
+}
+.json-panel {
+  text-align: left;
+  padding: 10px;
+  width: 700px;
+  height: 1000px;
+  overflow-y: scroll !important;
+  border: 1px solid darkolivegreen;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+}
+.json-pretty {
+  padding: 0;
+}
+
+.json-selected {
+  padding: 0;
+  background-color: rgba(139, 191, 228, 0.3);
+}
+
+.collapse-block {
+  position: relative;
+  pointer-events: none;
+}
+.collapse-block::before {
+  content: "▼";
+  /* content: url(data:image/svg+xml;base64,xevr...); */
+  font-size: 12px;
+  width: 14px;
+  height: 14px;
+  padding: 1px;
+  display: inline;
+  vertical-align: middle;
+  text-align: center;
+  color: lightgray;
+  position: absolute;
+  left: -14px;
+  /* top: 4px; */
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.rotate-0 {
+  transform: rotate(0);
+}
+.rotate-90 {
+  transform: rotate(-90deg);
+}
+
+/* .json-space {
+  color: #d4d4d4;
+} */
+.json-normal {
+  color: #d4d4d4;
+}
+
+.json-string {
+  color: #6caedd;
+}
+
+.json-key {
+  color: #ec5f67;
+}
+
+.json-boolean {
+  color: #99c794;
+}
+
+.json-number {
+  color: #99c794;
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="lib\jquery.json-viewer-master\json-viewer/jquery.json-viewer.js"></script>
+	<link href="lib\jquery.json-viewer-master\json-viewer/jquery.json-viewer.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+	<h3>JSON美化</h3>
+	<div class="container">
+		<pre id="jsonData"></pre>
+		<pre id="json-renderer"></pre>
+	</div>
+	<script>
+		// 1. 定义处理函数,在这里实现样式的自定义
+		function syntaxHighlight(json) {
+			if (typeof json != 'string') {
+				json = JSON.stringify(json, undefined, 2)
+			}
+			json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+			return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+				let cls = 'color:#D19A66'
+				if (/^"/.test(match)) {
+					if (/:$/.test(match)) {
+						cls = 'color:#F92A0F'
+					} else {
+						cls = 'color:#44C91B'
+					}
+				} else if (/true|false/.test(match)) {
+					cls = 'color:#1B73C9'
+				} else if (/null/.test(match)) {
+					cls = 'color:#C586C0'
+				}
+				return `<span style=${cls}>${match}</span>`
+			})
+		};
+
+		// 2. 调用函数，将待处理的数据传入
+		const data = {
+			code: '200',
+			message: '成功',
+			data: [
+				{
+					name: '三国演义',
+					id: 'sgyy'
+				},
+				{
+					name: '西游记',
+					id: 'xyj'
+				}
+			]
+		}
+		const jsonData = syntaxHighlight(data)
+		document.getElementById('jsonData').innerHTML = jsonData
+		$('#json-renderer').jsonViewer(data, { collapsed: false, withQuotes: true, withLinks: false })
+	</script>
+</body>
+
+</html>
