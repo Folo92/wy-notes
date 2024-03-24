@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var Direction;
 (function (Direction) {
     Direction[Direction["EAST"] = 0] = "EAST";
@@ -29,20 +40,39 @@ var MixEnum;
     MixEnum["A"] = "aaa";
     MixEnum[MixEnum["B"] = 2] = "B";
 })(MixEnum || (MixEnum = {}));
+/** 枚举合并 */
 var Color;
 (function (Color) {
-    Color["Red"] = "red";
-    Color["Green"] = "green";
-    Color["Blue"] = "blue";
+    Color["RED"] = "red";
+    Color["GREEN"] = "green";
+    Color["BLUE"] = "blue";
 })(Color || (Color = {}));
 var Shape;
 (function (Shape) {
-    Shape[Shape["Circle"] = 0] = "Circle";
-    Shape[Shape["Square"] = 1] = "Square";
-    Shape[Shape["Triangle"] = 2] = "Triangle";
+    Shape[Shape["CIRCLE"] = 0] = "CIRCLE";
+    Shape[Shape["SQUARE"] = 1] = "SQUARE";
+    Shape[Shape["TRIANGLE"] = 2] = "TRIANGLE";
 })(Shape || (Shape = {}));
-var combined = Shape.Square;
-console.log(combined);
+var ColorShape = __assign(__assign({}, Color), Shape); // 值合并
+var obj1 = Color.RED;
+var obj2 = Shape.SQUARE;
+var obj3 = ColorShape.GREEN;
+var obj4 = ColorShape.SQUARE;
+// 再次定义同名枚举，可新增枚举值，但规则上不允许修改已存在的枚举值
+(function (Color) {
+    Color["WHITE"] = "white";
+    Color["BLACK"] = "black";
+    Color["RED"] = "pink";
+})(Color || (Color = {}));
+var obj5 = Color.BLACK;
+var pi = 3.14;
+console.log(pi);
+// type UnionEnum<T, U> = {
+//   [K in keyof T | keyof U]: K extends keyof T ? T[K] : K extends keyof U ? U[K] : never;
+// };
+// type Combined = UnionEnum<Color, Shape>;
+// let combined: Combined = Shape.Square;
+// console.log(combined);
 // type Prefix<T extends { [K in keyof T]: string }, P extends string> = {
 //   [K in keyof T & string as `${P}_${K}`]: `${P}_${T[K]}`;
 // };

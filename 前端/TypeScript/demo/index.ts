@@ -42,7 +42,12 @@ demo.pop();
 // error: 类型“readonly [{ readonly item: { readonly name: "不可变"; }; }, 2]”上不存在属性“unshift”。
 demo.unshift();
 
-enum Gender {
-  MALE,
-  FEMALE,
+function demo(): never {
+  throw new Error("err");
 }
+function demo2(): never {
+  while (true) {}
+}
+
+const obj01: Object = 1; // 正常运行
+const obj02: object = 1; // error 不能将类型“number”分配给类型“object”

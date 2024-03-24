@@ -22,7 +22,7 @@ TypeScript 是**强类型**，它提供了一套静态检测机制，可以帮�
 
 ## 1.3 为什么要学习TypeScript？
 
-- 学习成本低
+- 学习成本低（入门简单，精通也难）
 - 能减少团队无效沟通
 - 能让代码更健壮
 - 有助于快速掌握其它后端语言
@@ -259,7 +259,7 @@ TS中的枚举类型是对包含有限数量的命名常量的集合的数据类
 
 TS中枚举使用关键字“enum”来定义一个新的枚举类型。
 
-枚举类型有三种定义方式：数字枚举、字符串枚举、数字和字符串混合枚举。
+枚举类型有三种定义方式：数字枚举、字符串枚举、异构枚举（数字和字符串混合）。
 
 - 数字枚举的取值，默认是从上至下从0开始递增，也可以手动指定枚举值。
 - 数字枚举如果手动指定了前面的枚举值，那么后面的枚举值会根据前面的值来递增。
@@ -320,7 +320,7 @@ console.log(Direction[1]); // 输出：SOUTH
 console.log(Direction[2]); // 输出：WEST
 ```
 
-### 3.3.4 内联枚举（const 枚举）
+### 3.3.4 内联枚举（常量枚举）
 
 TS 还支持内联枚举，这种类型的枚举**在编译时被删除并内联到引用的地方**。这可以提高性能，减少编译后代码的大小。例如：
 
@@ -336,9 +336,26 @@ let gender: Gender = Gender.FEMALE;
 var gender = 1 /* Gender.FEMALE */;
 ```
 
+<details>
+<summary>扩展知识</summary>
+
+es6 中 const 声明的常量仅在编译时约束了修改操作，实际并未进行值的内联替换。
+这一点与 Java、C# 等强类型语言的常量是不同的。
+
+```ts
+const pi = 3.14;
+console.log(pi);
+```
+编译后
+```js
+var pi = 3.14;
+console.log(pi); // 未被替换为 3.14
+```
+</details>
+
 ### 3.3.5 常量枚举表达式
 
-常数枚举表达式是指可以在编译时求值的表达式。这些表达式包括数字字面量、其他常数枚举表达式以及一些算术运算符。例如：
+常量枚举表达式是指可以在编译时求值的表达式。这些表达式包括数字字面量、其他常数枚举表达式以及一些算术运算符。例如：
 
 ```ts
 enum E {
@@ -370,34 +387,153 @@ var SectionArea;
 })(SectionArea || (SectionArea = {}));
 ```
 
-### 3.3.6 外部枚举
+### 3.3.6 枚举合并
 
-外部枚举使用declare关键字定义，文档描述：外部枚举用来描述已经存在的枚举类型的形状，意思就是说外部枚举用来描述当前环境中存在的枚举对象。外部枚举和普通枚举的一个区别就是，在外部枚举里面没有初始化的枚举成员会当成一个计算值，而在普通枚举里面则是一个常量。
-
-```ts
-declare enum EnumDemo {
-  A = 1,
-  B,
-  C = 2
-}
-```
-
-### 3.3.7 枚举合并
-
-在TypeScript中，你可以使用类型操作符如 & 来合并两个枚举类型。这种操作通常用于合并两个有相同类型成员的接口，但也可以用于合并枚举。
 ```ts
 enum Color {
-  Red,
-  Green,
-  Blue
+  RED = "red",
+  GREEN = "green",
+  BLUE = "blue",
+}
+enum Shape {
+  CIRCLE,
+  SQUARE,
+  TRIANGLE,
 }
 
-enum Shape {
-  Circle,
-  Square,
-  Triangle
+type ColorShape = Color | Shape; // 类型联合
+const ColorShape = { ...Color, ...Shape }; // 值合并
+
+const obj1: ColorShape = Color.RED;
+const obj2: ColorShape = Shape.SQUARE;
+const obj3: ColorShape = ColorShape.GREEN;
+const obj4: ColorShape = ColorShape.SQUARE;
+
+// 再次定义同名枚举，可新增枚举值，但规则上不允许修改已存在的枚举值
+enum Color {
+  WHITE = "white",
+  BLACK = "black",
+  RED = "pink", // 报错：标识符“RED”重复。（强行编译后代码也可以生效，RED枚举值被新值覆盖）
+}
+const obj5: ColorShape = Color.BLACK;
+```
+编译后
+```js
+var Color;
+(function (Color) {
+  Color["RED"] = "red";
+  Color["GREEN"] = "green";
+  Color["BLUE"] = "blue";
+})(Color || (Color = {}));
+var Shape;
+(function (Shape) {
+  Shape[Shape["CIRCLE"] = 0] = "CIRCLE";
+  Shape[Shape["SQUARE"] = 1] = "SQUARE";
+  Shape[Shape["TRIANGLE"] = 2] = "TRIANGLE";
+})(Shape || (Shape = {}));
+var ColorShape = __assign(__assign({}, Color), Shape); // 值合并
+var obj1 = Color.RED;
+var obj2 = Shape.SQUARE;
+var obj3 = ColorShape.GREEN;
+var obj4 = ColorShape.SQUARE;
+// 再次定义同名枚举，可新增枚举值，但规则上不允许修改已存在的枚举值
+(function (Color) {
+  Color["WHITE"] = "white";
+  Color["BLACK"] = "black";
+  Color["RED"] = "pink";
+})(Color || (Color = {}));
+var obj5 = Color.BLACK;
+```
+
+### *3.3.7 外部枚举（declare enum 定义的枚举）*
+
+外部枚举用来描述已经存在的枚举类型的形状，意思就是说外部枚举用来描述当前环境中存在的枚举对象。
+外部枚举和普通枚举的一个区别就是，在外部枚举里面没有初始化的枚举成员会当成一个计算值，而在普通枚举里面则是一个常量。
+外部枚举不会生成反向映射。
+
+## 3.4 any 和 void 类型
+
+### 3.4.1 any 类型
+
+any 表示任意类型，当不清楚某个值的具体类型的时候，可以使用 any。
+一般用于定义一些通用性比较强的变量，或者用于保存从其它框架中获取的不确定类型的值。
+在 TS 中任何数据类型的值都可以赋值给 any 类型。
+
+### 3.4.2 void 类型
+
+void 与any 正好相反，表示没有任何类型，一般用于函数返回值。
+在 TS 中只有 null（非严格模式下） 和 undefined 可以赋值给 void 类型。
+
+注意：非严格模式下，可以将 null 和 undefined 赋值给任意类型。
+
+```ts
+let value: void;
+value = 123; // 报错
+value = "abc"; // 报错
+value = true; // 报错
+value = null; // 严格模式报错
+value = undefined; // 不会报错
+
+let value2: number;
+value2 = undefined; // 严格模式报错
+```
+
+## 3.5 never 和 object 类型
+
+### 3.5.1 never 类型
+
+never 类型表示的是永不存在的值的类型，一般用于抛出异常或根本不可能有返回值的函数。
+
+```ts
+function demo(): never {
+  throw new Error("err");
+}
+function demo2(): never {
+  while (true) {}
 }
 ```
 
+### 3.5.2 object 类型
+
+#### object 与Object 有什么区别？
+
+object是TS中的类型（在JS中不存在），它是非基本数据类型的统称，包括Array（数组），Function（函数），Tuple（元组），Object（对象）等等。
+
+而 Object 可以看成是 JS 中的全局 Object 对象，它包括所有 JS 内置的对象类型，我们常说的万物皆对象说的就是Object。
+
+一句话总结：Object 包含了所有 JS 内置对象类型，而 object 包含了所有非原始类型的值。
+
+```ts
+const obj01: Object = 1; // 正常运行
+const obj02: object = 1; // error 不能将类型“number”分配给类型“object”
+```
+
+如果一个变量的类型是object，那么它可以存储任何引用类型的值。示例代码如下：
+
+```ts
+const obj: object = {}; // 对象
+const arr: object = [1, 2, 3]; // 数组
+const fn: object = function () { }; // 函数
+const tuple: object = ["count", 10]; // 元组
+const map: object = new Map(); // 键值对集合
+const set: object = new Set(); // 无序集合
+```
+上述代码写法不会报错，但是无法使用特有的属性或函数，如执行fn()，会提示无法执行，使用map.set会找不到该函数。
+解决方法是使用更具象的类型来表示变量，如：
+
+```ts
+const obj: Object = {};
+const arr: number[] = [1, 2, 3];
+const fn: Function = function () { };
+const tuple: [string, number] = ["count", 10];
+const map: Map<number, string> = new Map();
+const set: Set<string> = new Set();
+obj.valueOf();
+arr.push(4);
+fn();
+tuple.push(1);
+map.set(0, "0");
+set.add("hello");
+```
 
 

@@ -33,26 +33,44 @@ enum MixEnum {
   B = 2,
 }
 
+/** 枚举合并 */
+
 enum Color {
-  Red = "red",
-  Green = "green",
-  Blue = "blue",
+  RED = "red",
+  GREEN = "green",
+  BLUE = "blue",
 }
-
 enum Shape {
-  Circle,
-  Square,
-  Triangle,
+  CIRCLE,
+  SQUARE,
+  TRIANGLE,
 }
 
-type UnionEnum<T, U> = {
-  [K in keyof T | keyof U]: K extends keyof T ? T[K] : K extends keyof U ? U[K] : never;
-};
+type ColorShape = Color | Shape; // 类型联合
+const ColorShape = { ...Color, ...Shape }; // 值合并
 
-// 使用UnionEnum自动合并Color和Shape枚举
-type Combined = UnionEnum<Color, Shape>;
-let combined: Combined = Shape.Square;
-console.log(combined);
+const obj1: ColorShape = Color.RED;
+const obj2: ColorShape = Shape.SQUARE;
+const obj3: ColorShape = ColorShape.GREEN;
+const obj4: ColorShape = ColorShape.SQUARE;
+
+// 再次定义同名枚举，可新增枚举值，但规则上不允许修改已存在的枚举值
+enum Color {
+  WHITE = "white",
+  BLACK = "black",
+  RED = "pink", // 报错：标识符“RED”重复。（强行编译后代码也可以生效，RED枚举值被新值覆盖）
+}
+const obj5: ColorShape = Color.BLACK;
+
+const pi = 3.14;
+console.log(pi);
+
+// type UnionEnum<T, U> = {
+//   [K in keyof T | keyof U]: K extends keyof T ? T[K] : K extends keyof U ? U[K] : never;
+// };
+// type Combined = UnionEnum<Color, Shape>;
+// let combined: Combined = Shape.Square;
+// console.log(combined);
 
 // type Prefix<T extends { [K in keyof T]: string }, P extends string> = {
 //   [K in keyof T & string as `${P}_${K}`]: `${P}_${T[K]}`;
