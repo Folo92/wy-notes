@@ -504,7 +504,9 @@ any 表示任意类型，当不清楚某个值的具体类型的时候，可以�
 
 如果确实有些类型在最开始使用的时候无法确认，可以使用 unknown 类型。
 
-unknown 类型是所有类型的子类型，表示未知的值。与 any 类型相似，unknown 类型也可以被任何类型的变量赋值。
+unknown 类型是 TS3.0 中新增的一个顶级类型，被称作安全的 any。
+
+unknown 类型是所有类型的子类型，表示未知的值。与 any 类型相似，任何类型都可以赋值给 unknown 类型的变量。
 
 ```ts
 let value: unknown;
@@ -538,7 +540,20 @@ let value8: Function = value; // Error
 
 在对 any 类型的值执行操作之前，我们不必进行任何检查。
 
-而在对 unknown 类型的值执行大多数操作之前，必须进行某种形式的检查，以收窄我们正在处理的值的类型。
+而在对 unknown 类型的值执行大多数操作之前，必须进行某种形式的检查（类型断言或基于控制流的类型细化），以收窄我们正在处理的值的类型。
+
+注：直接对 unknown 类型进行相等或不等判断以及非严格模式下的其他关系判断（例如 >=）不会报错
+
+```ts
+let value1: unknown = 123;
+let value22: unknown = 123;
+console.log(value1 === value2); // OK
+console.log(value1 !== value2); // OK
+console.log(value1 == value2); // OK
+console.log(value1 != value2); // OK
+console.log(value1 >= value2); // 严格模式报错
+console.log(value1 > value2); // 严格模式报错
+```
 
 #### 收窄 unknown 类型
 

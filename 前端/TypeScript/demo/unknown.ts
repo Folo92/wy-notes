@@ -71,3 +71,12 @@ function processValue(value: unknown): string {
 }
 console.log(processValue("black")); // 输出: BLACK
 console.log(processValue(666)); // 输出: 666不是string类型
+
+let value11: unknown = 123;
+let value22: unknown = 123;
+console.log(value11 === value22);
+console.log(value11 !== value22);
+console.log(value11 == value22);
+console.log(value11 != value22);
+console.log(value11 >= value22); // 严格模式报错
+console.log(value11 > value22); // 严格模式报错

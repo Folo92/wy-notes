@@ -61,3 +61,11 @@ function processValue(value) {
 }
 console.log(processValue("black")); // 输出: BLACK
 console.log(processValue(666)); // 输出: 666不是string类型
+var value11 = 123;
+var value22 = 123;
+console.log(value11 === value22);
+console.log(value11 !== value22);
+console.log(value11 == value22);
+console.log(value11 != value22);
+console.log(value11 >= value22); // 严格模式报错
+console.log(value11 > value22); // 严格模式报错
