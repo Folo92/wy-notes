@@ -39,3 +39,24 @@ function demo() {
 function demo2() {
     while (true) { }
 }
+var obj01 = 1; // 正常运行
+var obj02 = 1; // error 不能将类型“number”分配给类型“object”
+var foo1 = {}; // 报错：类型“{}”缺少类型“Foo”中的以下属性: a, b
+var foo2 = {};
+var canvasEle1 = document.getElementById("my-canvas");
+var context1 = canvasEle1.getContext("2d"); // 报错：类型“HTMLElement”上不存在属性“getContext”。
+var canvasEle2 = document.getElementById("my-canvas");
+var context2 = canvasEle2.getContext("2d"); // 现在不会报ts错误
+// const foo = "abc" as number;
+// interface Foo {
+//   a: number;
+//   b: string;
+// }
+// const foo = {};
+// foo.a = 1; // 报错：类型“{}”上不存在属性“a”。
+// foo.b = "hello"; // 报错：类型“{}”上不存在属性“b”。
+function sum(a, b) {
+    return a + b;
+}
+var arr = [3, 4];
+console.log(sum.apply(void 0, arr)); // 报错：扩张参数必须具有元组类型或传递给 rest 参数。
