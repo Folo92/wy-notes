@@ -80,3 +80,8 @@ function sum(a: number, b: number) {
 }
 const arr = [3, 4];
 console.log(sum(...arr)); // 报错：扩张参数必须具有元组类型或传递给 rest 参数。
+
+let str: string;
+str = "ABC"; // OK
+str = null; // 报错（严格空值检查模式）
+str = undefined; // 报错（严格空值检查模式）

@@ -6,6 +6,12 @@
 
 TypeScript（简称 TS） 是由 Microsoft 开发的、基于 JavaScript（简称 JS） 的语言，可以被看作是 **JavaScript 的一个超集**。
 
+<a href="http://tslang.cn/">
+    <img src="images/1711463521033.jpg" width="480" style="border-radius:20px;">
+</a>
+
+[TypeScript 中文网](http://tslang.cn/docs/home.html)
+
 ## 1.1 TypeScript 与 JavaScript 的关系
 
 - TS 和 JS 之间的关系其实就像 Less/Sass 和 CSS 之间的关系：
@@ -32,6 +38,8 @@ TypeScript（简称 TS） 是由 Microsoft 开发的、基于 JavaScript（简�
 # 二、使用步骤
 
 ## 2.1 安装 TypeScript
+
+通过 npm 安装：
 
 ```
 npm install -g typescript
@@ -128,25 +136,58 @@ tsc --init
 
 **strict**： 开启所有严格检查选项，严格模式下，需要我们对每一个成员都要指定明确的类型等等
 
+**......**
+
 **_注意，如果还是使用 tsc 编译某个 ts 文件，配置文件是不起作用的，只有当直接运行 tsc 命令去编译整个项目时，配置文件才生效。_**
 
-# 三、TypeScript 类型
+### 2.2.4 结合 webpack 使用
 
-## 3.1 基础类型
+参考文档：[将 TypeScript 和 webpack 结合在一起使用](http://tslang.cn/docs/handbook/react-&-webpack.html)
 
-### 3.1.1 Boolean 类型
+# 三、TypeScript 基础类型
+
+## 3.1 从类型注解讲起
+
+### 3.1.1 类型注解
+
+TS 里的类型注解是一种轻量级的为函数或变量添加约束的方式。形如：
+
+变量名: 类型名
+
+```ts
+let count: number = 10;
+```
+
+TS 提供了静态的代码分析，它可以分析代码结构和提供的类型注解。
+
+如果编译时推断出变量类型与类型注解不一致，编译器会报错，但 js 文件还是会被编译出来。
+
+### 3.1.2 基础类型有哪些
+
+当前版本 TS 中基础类型共有 13 种：
+布尔型、数字、字符串、数组、元组、枚举、any、unknown、void、null、undefined、never、object。
+
+### 3.1.3 boolean 类型
+
+布尔类型，同 JS。
 
 ```ts
 let isDone: boolean = false; // ES5: var isDone = false;
 ```
 
-### 3.1.2 Number 类型
+### 3.1.4 number 类型
+
+和 JS 一样，TS 里的所有数字都是浮点数，类型是 number。支持 2、8、10、16 等各种进制。
+
+NaN 和 Infinity 也属于 number 类型。
 
 ```ts
 let count: number = 10; // ES5: var count = 10;
 ```
 
-### 3.1.3 String 类型
+### 3.1.5 string 类型
+
+同 JS，用 string 表示字符串类型，支持单引号、双引号和模板字符串。
 
 ```ts
 let name: string = "Java"; // ES5: var name = 'Java';
@@ -247,7 +288,7 @@ type intersectionTuple = [...tupleFirst, ...tupleSecond]; // [number, string]
 
 枚举类型是 TS 为 JS 扩展的一种类型，在原生 JS 中是没有枚举类型的。
 
-TS 中的枚举类型是对包含有限数量的命名常量的集合的数据类型的**统称**。每一个定义出来的枚举都是独立的 TS 类型。
+TS 中的枚举类型是对**包含有限数量的命名常量的集合**的数据类型的**统称**。每一个定义出来的枚举都是独立的 TS 类型。
 
 枚举的作用：
 
@@ -477,13 +518,18 @@ var obj5 = Color.BLACK;
 
 外部枚举不会生成反向映射。
 
-## 3.4 any、unknown 和 void 类型
+## 3.4 any、unknown、void、null 和 undefined 类型
 
 ### 3.4.1 any 类型
 
-any 表示任意类型，当不清楚某个值的具体类型的时候，可以使用 any。
+any 表示任意类型，当不清楚某个值的具体类型的时候，可以使用 any。比如，有一个数组，它包含了不同的类型的数据：
 
-一般用于定义一些通用性比较强的变量，或者用于保存从其它框架中获取的不确定类型的值。
+```ts
+let list: any[] = [1, true, "free"];
+list[1] = 100;
+```
+
+any 一般用于定义一些通用性比较强的变量，或者用于保存从其它框架中获取的不确定类型的值。
 
 在 TS 中**任何数据类型的值都可以赋值给 any 类型**。
 
@@ -591,6 +637,39 @@ value = undefined; // 不会报错
 
 let value2: number;
 value2 = undefined; // 严格模式报错
+```
+
+### 3.4.4 null 和 undefined
+
+TS 中，null 和 undefined 两者各有自己的类型，分别就叫 null 和 undefined。
+
+```ts
+let n: null = null; // 只能用 null 赋值
+let u: undefined = undefined; // 只能用 undefined 赋值
+```
+
+默认情况下 null 和 undefined 是所有类型的子类型，可以把 null 和 undefined 赋值给 number 类型的变量。
+
+#### 严格空值检查模式（strictNullChecks = true）
+
+如果开启了严格空值检查模式（默认开启），null 和 undefined 无法赋值给其他类型的变量，只能赋值给 void 和它们自身的类型。
+
+例如下面的代码在 strictNullChecks 为 true 时，是无法编译通过的：
+
+```ts
+let str: string;
+str = "ABC"; // OK
+str = null; // 报错（严格空值检查模式）
+str = undefined; // 报错（严格空值检查模式）
+```
+
+此时若想传入 null 或 undefined，可以使用联合类型 string | null | undefined。
+
+```ts
+let str: string | null | undefined;
+str = "ABC"; // OK
+str = null; // OK
+str = undefined; // OK
 ```
 
 ## 3.5 never 和 object 类型
@@ -879,3 +958,9 @@ console.log(sum(...arr));
 - 类型断言是编译时的概念，不等同于运行时的类型转换。
 - 尽量少用类型断言，因为它可能会隐藏掉代码中的坏味道。
 - const 断言是一种特殊的类型断言，某些场景下比较有用。
+
+# 四、TypeScript 高级类型
+
+## 4.1 接口
+
+TypeScript 的核心原则之一是对值所具有的结构进行类型检查。 它有时被称做“鸭式辨型法”或“结构性子类型化”。 在 TypeScript 里，接口的作用就是为这些类型命名和为你的代码或第三方代码定义契约。

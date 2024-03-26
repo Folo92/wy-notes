@@ -60,3 +60,7 @@ function sum(a, b) {
 }
 var arr = [3, 4];
 console.log(sum.apply(void 0, arr)); // 报错：扩张参数必须具有元组类型或传递给 rest 参数。
+var str;
+str = "ABC"; // OK
+str = null; // 报错（严格空值检查模式）
+str = undefined; // 报错（严格空值检查模式）
