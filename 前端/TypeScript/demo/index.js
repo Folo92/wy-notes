@@ -41,12 +41,16 @@ function demo2() {
 }
 var obj01 = 1; // 正常运行
 var obj02 = 1; // error 不能将类型“number”分配给类型“object”
-var foo1 = {}; // 报错：类型“{}”缺少类型“Foo”中的以下属性: a, b
-var foo2 = {};
-var canvasEle1 = document.getElementById("my-canvas");
-var context1 = canvasEle1.getContext("2d"); // 报错：类型“HTMLElement”上不存在属性“getContext”。
-var canvasEle2 = document.getElementById("my-canvas");
-var context2 = canvasEle2.getContext("2d"); // 现在不会报ts错误
+// interface Foo {
+//   a: number;
+//   b: string;
+// }
+// const foo1: Foo = {}; // 报错：类型“{}”缺少类型“Foo”中的以下属性: a, b
+// const foo2: Foo = {} as Foo;
+// const canvasEle1 = document.getElementById("my-canvas");
+// const context1 = canvasEle1.getContext("2d"); // 报错：类型“HTMLElement”上不存在属性“getContext”。
+// const canvasEle2 = document.getElementById("my-canvas") as HTMLCanvasElement;
+// const context2 = canvasEle2.getContext("2d"); // 现在不会报ts错误
 // const foo = "abc" as number;
 // interface Foo {
 //   a: number;

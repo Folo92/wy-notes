@@ -309,7 +309,7 @@ TS 中的枚举类型是对**包含有限数量的命名常量的集合**的数�
 
 ### 3.3.2 枚举的基本语法
 
-TS 中枚举使用关键字“enum”来定义一个新的枚举类型。
+TS 中使用关键字“enum”来定义一个枚举类型。
 
 枚举类型有三种定义方式：数字枚举、字符串枚举、异构枚举（数字和字符串混合）。
 
@@ -592,7 +592,7 @@ let value8: Function = value; // Error
 
 ```ts
 let value1: unknown = 123;
-let value22: unknown = 123;
+let value2: unknown = 123;
 console.log(value1 === value2); // OK
 console.log(value1 !== value2); // OK
 console.log(value1 == value2); // OK
@@ -961,6 +961,139 @@ console.log(sum(...arr));
 
 # 四、TypeScript 高级类型
 
-## 4.1 接口
+## 4.1 接口（interface）
 
-TypeScript 的核心原则之一是对值所具有的结构进行类型检查。 它有时被称做“鸭式辨型法”或“结构性子类型化”。 在 TypeScript 里，接口的作用就是为这些类型命名和为你的代码或第三方代码定义契约。
+TypeScript 的核心原则之一是对值所具有的结构进行类型检查。
+
+在 TypeScript 中，接口的作用就是为这些类型命名和为我们的代码或第三方代码定义契约。
+
+### 4.1.1 接口的定义
+
+TS 中使用关键字“interface”来定义一个接口类型，用来约束对象、函数、类等非基本数据的结构。
+
+### 4.1.2 接口的各类属性
+
+1、基础属性：必须包含，类型必须匹配。
+
+2、可选属性：属性名后加“?”，表示可有可无，如果有，类型必须匹配。
+
+3、只读属性：用 readonly 修饰符，值不允许修改，只能在对象创建的时候给初始值。
+
+<details style="margin:1em;">
+<summary>readonly 与 const 的区别</summary>
+最简单判断该用 readonly 还是 const 的方法：作为变量用 const，作为属性则用 readonly。
+</details>
+
+4、额外属性：除了已列出的属性，还可以添加其他的属性名不确定的键值对。
+
+用接口限制一个数据, 必须把所有可能会出现的属性都写上吗？万一只能确定部分属性, 其他的不确定怎么办呢？这时候可以用额外属性。
+
+```ts
+interface UserInfo {
+  userName: string; // 基础属性
+  gender?: number; // 可选属性
+  readonly userId: string; // 只读属性
+  readonly status?: number; // 只读可选属性
+  [props: string]: any; // 值类型为 any 的额外属性
+}
+let user: UserInfo = {
+  userName: "Jone",
+  userId: "u1s1",
+};
+user.gender = 1; // 后添加可选属性
+user.userId = "2333"; // 报错：无法为“userId”赋值，因为它是只读属性。
+user.status = 2; // 报错：无法为“status”赋值，因为它是只读属性。
+user.age = 18; // 额外属性
+user.city = "nanjing"; // 额外属性
+user[0] = "TEST"; // 索引 0 会被转为字符串"0"
+
+// 有个办法可以变相绕过只读限制：将对象赋值给另一个变量
+user = {
+  userName: "Jone",
+  userId: "2333",
+  status: 2,
+}; // 不报错
+```
+
+严格来说，额外属性不建议随便使用，我们最好准确把握自己写的数据类型。
+否则，如果利用额外属性给接口约束的变量随意添加属性，接口的意义就不是很大了。
+例如，上面的例子，如果不小心给一个叫“username”的属性赋值，TS 并不会报错，这与我们的预期是不符的。
+
+```ts
+// username 不是 userName
+user.username = "Tony"; // 不报错
+```
+
+### 4.1.3 函数型接口
+
+接口除了能约束带有属性的普通对象外，也可以约束函数类型。
+
+接口对于函数的约束有两个部分：参数和返回值。
+
+```ts
+interface SearchFunc {
+  (x: number, y: string): string;
+}
+const fn: SearchFunc = function (x, y) {
+  return x + y;
+};
+```
+
+### 4.1.4 索引型接口
+
+TypeScript 支持两种索引签名：字符串和数字。可以同时使用两种类型的索引，但是数字索引的返回值必须是字符串索引返回值类型的子类型。这是因为当使用 number 来索引时，JavaScript 会将它转换成 string 然后再去索引对象。也就是说用 100（number）去索引等同于使用"100"（string）去索引，因此两者需要保持一致。
+
+```ts
+class Animal {
+  name: string;
+}
+class Dog extends Animal {
+  breed: string;
+}
+// 错误：使用数值型的字符串索引，有时会得到完全不同的Animal!
+interface NotOkay {
+  [x: number]: Animal;
+  [x: string]: Dog;
+}
+```
+
+字符串索引签名能够很好的描述 dictionary 模式，并且它们也会确保所有属性与其返回值类型相匹配。 因为字符串索引声明了 obj.property 和 obj["property"]两种形式都可以。 下面的例子里， name 的类型与字符串索引类型不匹配，所以类型检查器给出一个错误提示：
+
+```ts
+interface NumberDictionary {
+  [index: string]: number;
+  length: number; // 可以，length是number类型
+  name: string; // 错误，`name`的类型与索引类型返回值的类型不匹配
+}
+```
+
+最后，你可以将索引签名设置为只读，这样就防止了给索引赋值：
+
+```ts
+interface ReadonlyStringArray {
+  readonly [index: number]: string;
+}
+let myArray: ReadonlyStringArray = ["Alice", "Bob"];
+myArray[2] = "Mallory"; // error!
+```
+
+你不能设置 myArray[2]，因为索引签名是只读的。
+
+索引型接口有一个用法是用接口去约束一个数组，等价于普通约束数组的方式，不同之处在于接口有自定义的名称。
+
+```ts
+interface StringArray {
+  [index: number]: string;
+}
+let list: StringArray = ["A", "B"];
+// 等价于
+let list2: string[] = ["A", "B"];
+```
+
+### 4.1.5 类（class）接口
+
+类接口要完整讲清楚的话非常复杂。
+
+一般业务开发过程中很少会对类进行限制，因为类其实本身就是一种限制。
+
+框架开发可能会用到，例如 Angular。
